@@ -45,8 +45,10 @@ terrainWorker.onmessage = (event) => {
     terrainParams.segments,
     terrainParams.segments
   );
+  // Rotate the geometry to be horizontal
+  geometry.rotateX(-Math.PI / 2);
 
-  // Displace vertices
+  // Displace vertices along the Y-axis
   const vertices = geometry.attributes.position.array;
   for (let i = 0; i < heightmap.length; i++) {
     // y-coordinate is at index i*3 + 1
@@ -55,9 +57,8 @@ terrainWorker.onmessage = (event) => {
   geometry.attributes.position.needsUpdate = true;
   geometry.computeVertexNormals(); // Recalculate normals for correct lighting
 
-  const material = new THREE.MeshStandardMaterial({ color: 0xcccccc, wireframe: true });
+  const material = new THREE.MeshStandardMaterial({ color: 0xcccccc, wireframe: false });
   const terrainMesh = new THREE.Mesh(geometry, material);
-  terrainMesh.rotation.x = -Math.PI / 2; // Rotate to be flat
 
   scene.add(terrainMesh);
 
