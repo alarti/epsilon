@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
 
-const pwaOptions: Partial<VitePWAOptions> = {
+const pwaOptions = {
   registerType: 'autoUpdate',
   manifest: {
     name: 'Chronosplit - 3D Runner',
