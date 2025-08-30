@@ -29,7 +29,10 @@ const pwaOptions: Partial<VitePWAOptions> = {
   },
 };
 
-export default defineConfig({
-  base: '/epsilon/',
-  plugins: [VitePWA(pwaOptions)],
+export default defineConfig(({ command }) => {
+  const isBuild = command === 'build';
+  return {
+    base: isBuild ? '/epsilon/' : '/',
+    plugins: [VitePWA(pwaOptions)],
+  };
 });
