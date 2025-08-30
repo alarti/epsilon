@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MockAIDirector } from './ai-director.js';
+import { AIDirector } from './ai-director.js';
 
 // --- DOM & State ---
 const hudTime = document.getElementById('hud-time');
@@ -138,16 +138,43 @@ function resetLevel() {
   doorOverlay.classList.add('hidden');
 }
 
+// This function will now apply the AI's parameters
+function applyRunParameters(params) {
+  // Mutate visual theme
+  if (params.visualTheme.fog) {
+    const { color, near, far } = params.visualTheme.fog;
+    scene.fog = new THREE.Fog(color, near, far);
+    renderer.setClearColor(scene.fog.color); // Match background to fog
+  } else {
+    scene.fog = null;
+    renderer.setClearColor(scene.background);
+  }
+
+  // Mutate gameplay parameters
+  const delta = params.difficultyDelta;
+  player.speed = 20.0 * delta;
+  terrainParams.amplitude = 15.0 * delta;
+  console.log(`Difficulty delta ${delta} applied. New speed: ${player.speed}, New amplitude: ${terrainParams.amplitude}`);
+}
+
+
 doorButtons.forEach(button => {
-  button.addEventListener('click', () => {
+  button.addEventListener('click', async () => {
+    // Prevent multiple clicks
+    doorOverlay.style.pointerEvents = 'none';
+
     const difficulty = button.dataset.difficulty;
 
-    // Call the mock AI director
-    const nextRunParams = MockAIDirector.getRunParameters(gameState, difficulty);
+    // Call the AI director
+    const nextRunParams = await AIDirector.getRunParameters(gameState, difficulty);
     console.log('AI Director returned:', nextRunParams);
 
-    // In the future, these params would be used to configure the next level
+    // Apply the new parameters
+    applyRunParameters(nextRunParams);
+
+    // Reset the level for the new run
     resetLevel();
+    doorOverlay.style.pointerEvents = 'auto';
   });
 });
 
