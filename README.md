@@ -1,64 +1,28 @@
-# Chronosplit - 3D Web Game
+# Chronosplit - Vanilla JS Version
 
-This is the repository for Chronosplit, an infinitely replayable, AI-driven 3D web game built with TypeScript, Vite, and Three.js.
+This is the repository for Chronosplit, a 3D web game prototype. This version is built with plain ("vanilla") JavaScript and uses an ES Module import for Three.js directly from a CDN.
 
-## Project Overview
+## Project Structure
 
-This project is a 3D runner game featuring procedurally generated levels, dynamic difficulty adjusted by an AI Director, and a reactive narrative system. It is designed to be a lightweight, performant, and highly replayable web experience.
+- `index.html`: The main entry point of the application. It contains the HTML structure, the import map for Three.js, and links to the CSS and JavaScript files.
+- `main.js`: Contains all the game logic, including the Three.js scene setup and animation loop.
+- `style.css`: Contains the styles for the HUD and page layout.
 
-## Development
+## How to Run
 
-### Prerequisites
+This project does not require any build tools, Node.js, or `npm`.
 
-- [Node.js](https://nodejs.org/) (LTS version recommended)
-- [npm](https://www.npmjs.com/) (comes with Node.js)
+1.  **Clone the repository.**
+2.  **Run a local server.** You need to serve the files from a local server. You cannot just open `index.html` directly in the browser from the filesystem (`file:///...`) because ES Modules have security restrictions (CORS) that prevent them from loading this way.
 
-### Installation
+    A simple way to do this is to use Python's built-in web server. Open your terminal in the project's root directory and run:
 
-1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-username/epsilon.git
-    cd epsilon
+    # For Python 3
+    python -m http.server
     ```
-
-2.  Install the dependencies:
+    Or, if you have Node.js installed, you can use the `serve` package:
     ```bash
-    npm install
+    npx serve
     ```
-
-### Running the Development Server
-
-To start the local development server with hot-reloading, run the following command:
-
-```bash
-npm run dev
-```
-
-This will open the application in your default browser, typically at `http://localhost:5173`.
-
-### Building for Production
-
-To create a production-ready build of the application, run:
-
-```bash
-npm run build
-```
-
-The output files will be located in the `dist/` directory.
-
-## Deployment to GitHub Pages
-
-This project is configured for easy deployment to GitHub Pages.
-
-1.  **Push to GitHub:** Make sure your project is hosted on a GitHub repository.
-
-2.  **Run the Deploy Script:** Use the following command to build the project and deploy it to the `gh-pages` branch:
-    ```bash
-    npm run deploy
-    ```
-
-    This script will:
-    - Run `npm run build` to generate the production assets.
-    - Use the `gh-pages` package to push the contents of the `dist` directory to the `gh-pages` branch on your repository.
-
-3.  **Configure GitHub Pages:** In your repository settings on GitHub, navigate to the "Pages" section and set the source to the `gh-pages` branch. Your site will be live at `https://your-username.github.io/epsilon/`.
+3.  **Open in your browser:** Navigate to the URL provided by the server (usually `http://localhost:8000` or `http://localhost:3000`).
