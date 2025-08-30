@@ -17,8 +17,8 @@ This project is a 3D runner game featuring procedurally generated levels, dynami
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-username/chronosplit.git
-    cd chronosplit
+    git clone https://github.com/your-username/epsilon.git
+    cd epsilon
     ```
 
 2.  Install the dependencies:
@@ -61,4 +61,4 @@ This project is configured for easy deployment to GitHub Pages.
     - Run `npm run build` to generate the production assets.
     - Use the `gh-pages` package to push the contents of the `dist` directory to the `gh-pages` branch on your repository.
 
-3.  **Configure GitHub Pages:** In your repository settings on GitHub, navigate to the "Pages" section and set the source to the `gh-pages` branch. Your site will be live at `https://your-username.github.io/chronosplit/`.
+3.  **Configure GitHub Pages:** In your repository settings on GitHub, navigate to the "Pages" section and set the source to the `gh-pages` branch. Your site will be live at `https://your-username.github.io/epsilon/`.

@@ -30,6 +30,6 @@ const pwaOptions: Partial<VitePWAOptions> = {
 };
 
 export default defineConfig({
-  base: '/chronosplit/',
+  base: '/epsilon/',
   plugins: [VitePWA(pwaOptions)],
 });
