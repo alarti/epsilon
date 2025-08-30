@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // --- SCENE SETUP ---
 const scene = new THREE.Scene();
@@ -17,6 +18,11 @@ camera.position.z = 5;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 container.appendChild(renderer.domElement);
+
+// --- CONTROLS ---
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+controls.dampingFactor = 0.05;
 
 // --- TERRAIN WORKER ---
 console.log('Setting up terrain worker...');
@@ -82,7 +88,7 @@ scene.add(directionalLight);
 function animate() {
   requestAnimationFrame(animate);
 
-  // Scene-level animations can go here
+  controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
   renderer.render(scene, camera);
 }

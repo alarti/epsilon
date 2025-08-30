@@ -1,4 +1,4 @@
-import { createNoise2D } from 'simplex-noise';
+import { createNoise2D } from 'https://esm.sh/simplex-noise@4.0.1';
 
 // Initialize the noise function
 const noise2D = createNoise2D();
