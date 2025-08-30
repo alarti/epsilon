@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA, VitePWAOptions } from 'vite-plugin-pwa';
 
@@ -34,5 +35,12 @@ export default defineConfig(({ command }) => {
   return {
     base: isBuild ? '/epsilon/' : '/',
     plugins: [VitePWA(pwaOptions)],
+    build: {
+      rollupOptions: {
+        input: {
+          main: resolve(__dirname, 'index.html'),
+        },
+      },
+    },
   };
 });
