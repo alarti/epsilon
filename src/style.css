@@ -1,0 +1,31 @@
+/* --- Global Styles --- */
+body {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+/* --- Game Canvas Container --- */
+#game-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
+}
+
+/* --- HUD Overlay --- */
+#hud {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  font-size: 16px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+#hud > div {
+  margin-bottom: 5px;
+}
