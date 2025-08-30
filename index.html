@@ -11,8 +11,7 @@
     <script type="importmap">
       {
         "imports": {
-          "three": "https://esm.sh/three@0.165.0",
-          "three/addons/": "https://esm.sh/three@0.165.0/examples/jsm/"
+          "three": "https://esm.sh/three@0.165.0"
         }
       }
     </script>
@@ -26,5 +25,14 @@
     </div>
 
     <script type="module" src="./main.js"></script>
+
+    <div id="door-overlay" class="hidden">
+      <div id="door-container">
+        <h2>Choose Your Path</h2>
+        <button class="door-choice" data-difficulty="easy">Easy Path</button>
+        <button class="door-choice" data-difficulty="medium">Medium Path</button>
+        <button class="door-choice" data-difficulty="hard">Hard Path</button>
+      </div>
+    </div>
   </body>
 </html>

@@ -29,3 +29,44 @@ body {
 #hud > div {
   margin-bottom: 5px;
 }
+
+/* --- Door Overlay --- */
+#door-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+#door-overlay.hidden {
+  display: none;
+}
+
+#door-container {
+  background: #222;
+  padding: 40px;
+  border-radius: 10px;
+  border: 2px solid #888;
+}
+
+.door-choice {
+  padding: 10px 20px;
+  font-size: 18px;
+  margin: 10px;
+  cursor: pointer;
+  background-color: #444;
+  color: white;
+  border: 1px solid #666;
+  border-radius: 5px;
+}
+
+.door-choice:hover {
+  background-color: #555;
+}
