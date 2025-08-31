@@ -4,9 +4,11 @@ import { generateGenome, evolve } from './pollination.js';
 
 // --- DOM & State ---
 const organisms = new Map();
+const infoPanel = document.getElementById('info-panel');
 const infoContent = document.getElementById('info-content');
 const evolveBtn = document.getElementById('evolve-btn');
 const generationCountSpan = document.getElementById('generation-count');
+const toggleInfoPanelBtn = document.getElementById('toggle-info-panel');
 let generation = 1;
 
 // --- SCENE SETUP ---
@@ -176,8 +178,20 @@ window.addEventListener('click', (event) => {
         if (organismClicked) break;
     }
 
-    if (!organismClicked) {
+    if (!organismClicked && !event.target.closest('.panel-toggle-btn')) {
         updateInfoPanel(null);
+    }
+});
+
+toggleInfoPanelBtn.addEventListener('click', () => {
+    infoPanel.classList.toggle('hidden');
+    const isHidden = infoPanel.classList.contains('hidden');
+    if (isHidden) {
+        toggleInfoPanelBtn.innerHTML = '&gt;';
+        toggleInfoPanelBtn.style.left = '20px';
+    } else {
+        toggleInfoPanelBtn.innerHTML = '&lt;';
+        toggleInfoPanelBtn.style.left = '280px';
     }
 });
 

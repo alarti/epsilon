@@ -29,7 +29,36 @@ body {
   top: 20px;
   left: 20px;
   width: 250px;
+  transition: transform 0.4s ease-in-out;
+  z-index: 10;
 }
+
+#info-panel.hidden {
+  transform: translateX(-110%);
+}
+
+.panel-toggle-btn {
+  position: absolute;
+  top: 20px;
+  left: 280px; /* Position it to the right of the panel */
+  width: 30px;
+  height: 30px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  z-index: 11;
+  font-size: 1.2em;
+  line-height: 1.5;
+  text-align: center;
+  transition: transform 0.4s ease-in-out, left 0.4s ease-in-out;
+}
+
+#info-panel.hidden + .panel-toggle-btn {
+    /* This won't work because the button is before the panel. JS will handle this. */
+}
+
 
 #generation-panel {
   bottom: 20px;
