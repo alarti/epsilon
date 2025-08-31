@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { generateGenome, evolve } from './pollination.js';
+import { generateGenome, evolve, megaEvolve } from './pollination.js';
 
 // --- DOM & State ---
 const organisms = new Map();
@@ -9,7 +9,10 @@ const infoContent = document.getElementById('info-content');
 const evolveBtn = document.getElementById('evolve-btn');
 const generationCountSpan = document.getElementById('generation-count');
 const toggleInfoPanelBtn = document.getElementById('toggle-info-panel');
+const toggleAutoEvolveBtn = document.getElementById('toggle-auto-evolve');
+
 let generation = 1;
+let autoEvolveInterval = null;
 
 // --- SCENE SETUP ---
 const scene = new THREE.Scene();
@@ -99,6 +102,22 @@ function clearGeneration() {
     }
     organisms.clear();
     updateInfoPanel(null); // Clear the info panel
+}
+
+function runMegaEvolution() {
+    const parentGenomes = Array.from(organisms.values()).map(org => org.genome);
+    if (parentGenomes.length === 0) return;
+
+    // Use megaEvolve for a big jump
+    const newGenomes = parentGenomes.map(parent => megaEvolve(parent, 100000));
+
+    clearGeneration();
+    newGenomes.forEach(genome => createOrganismFromGenome(genome));
+
+    generation += 100000;
+    // Format with commas
+    generationCountSpan.textContent = generation.toLocaleString();
+    console.log(`Mega-evolved to generation ${generation}.`);
 }
 
 
@@ -211,8 +230,26 @@ evolveBtn.addEventListener('click', () => {
 
     // 5. Update generation counter
     generation++;
-    generationCountSpan.textContent = generation;
+    generationCountSpan.textContent = generation.toLocaleString();
     console.log(`Evolved to generation ${generation}. Population: ${organisms.size}`);
+});
+
+toggleAutoEvolveBtn.addEventListener('click', () => {
+    const currentState = toggleAutoEvolveBtn.dataset.state;
+    if (currentState === 'stopped') {
+        // Start auto-evolution
+        autoEvolveInterval = setInterval(runMegaEvolution, 1000);
+        toggleAutoEvolveBtn.dataset.state = 'running';
+        toggleAutoEvolveBtn.textContent = 'Detener Auto-Evolución';
+        evolveBtn.disabled = true; // Disable manual evolution
+    } else {
+        // Stop auto-evolution
+        clearInterval(autoEvolveInterval);
+        autoEvolveInterval = null;
+        toggleAutoEvolveBtn.dataset.state = 'stopped';
+        toggleAutoEvolveBtn.textContent = 'Iniciar Auto-Evolución';
+        evolveBtn.disabled = false; // Re-enable manual evolution
+    }
 });
 
 

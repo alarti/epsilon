@@ -94,6 +94,34 @@ h2 {
   background-color: #0056b3;
 }
 
+#toggle-auto-evolve {
+  width: 100%;
+  padding: 10px;
+  font-size: 1em;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+#toggle-auto-evolve[data-state="stopped"] {
+  background-color: #28a745; /* Green */
+}
+
+#toggle-auto-evolve[data-state="stopped"]:hover {
+  background-color: #218838;
+}
+
+#toggle-auto-evolve[data-state="running"] {
+  background-color: #dc3545; /* Red */
+}
+
+#toggle-auto-evolve[data-state="running"]:hover {
+  background-color: #c82333;
+}
+
 #generation-count {
   font-weight: bold;
 }
