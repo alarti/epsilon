@@ -1,39 +1,35 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chronosplit - Vanilla JS</title>
-    <link rel="stylesheet" href="./style.css">
-  </head>
-  <body>
-    <!-- Import Map for ES Modules -->
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://esm.sh/three@0.165.0",
-          "cannon-es": "https://esm.sh/cannon-es@0.20.0"
-        }
-      }
-    </script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Evolución 3D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="info-panel">
+        <h2>Componentes del Organismo</h2>
+        <div id="info-content">
+            <p>Selecciona un organismo para ver sus detalles.</p>
+        </div>
+    </div>
+
+    <div id="generation-panel">
+        <h2>Control de Generaciones</h2>
+        <button id="evolve-btn">Evolucionar</button>
+        <p>Generación: <span id="generation-count">1</span></p>
+    </div>
 
     <div id="game-container"></div>
 
-    <div id="hud">
-      <div id="hud-time">Time: 0.0s</div>
-      <div id="hud-health">Health: 100</div>
-      <div id="hud-resources">Keys: 0</div>
-    </div>
-
-    <script type="module" src="./main.js"></script>
-
-    <div id="door-overlay" class="hidden">
-      <div id="door-container">
-        <h2>Choose Your Path</h2>
-        <button class="door-choice" data-difficulty="easy">Easy Path</button>
-        <button class="door-choice" data-difficulty="medium">Medium Path</button>
-        <button class="door-choice" data-difficulty="hard">Hard Path</button>
-      </div>
-    </div>
-  </body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://esm.sh/three@0.165.0",
+                "cannon-es": "https://esm.sh/cannon-es@0.20.0"
+            }
+        }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
 </html>
