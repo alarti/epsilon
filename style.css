@@ -72,9 +72,8 @@ body {
 
 #generation-panel {
   bottom: 20px;
-  left: 20px;
+  right: 20px; /* Changed from left */
   width: 250px;
-  z-index: 100; /* Force this panel to the top */
 }
 
 h2 {

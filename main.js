@@ -109,12 +109,12 @@ function runMegaEvolution() {
     if (parentGenomes.length === 0) return;
 
     // Use megaEvolve for a big jump
-    const newGenomes = parentGenomes.map(parent => megaEvolve(parent, 100000));
+    const newGenomes = parentGenomes.map(parent => megaEvolve(parent, 1000));
 
     clearGeneration();
     newGenomes.forEach(genome => createOrganismFromGenome(genome));
 
-    generation += 100000;
+    generation += 1000;
     // Format with commas
     generationCountSpan.textContent = generation.toLocaleString();
     console.log(`Mega-evolved to generation ${generation}.`);
@@ -142,6 +142,23 @@ function animate() {
 
 // Create the first organism
 createInitialPopulation();
+
+function startAutoEvolution() {
+    if (autoEvolveInterval) return; // Already running
+    autoEvolveInterval = setInterval(runMegaEvolution, 1000);
+    toggleAutoEvolveBtn.dataset.state = 'running';
+    toggleAutoEvolveBtn.textContent = 'Detener Auto-Evolución';
+    evolveBtn.disabled = true;
+}
+
+function stopAutoEvolution() {
+    if (!autoEvolveInterval) return; // Already stopped
+    clearInterval(autoEvolveInterval);
+    autoEvolveInterval = null;
+    toggleAutoEvolveBtn.dataset.state = 'stopped';
+    toggleAutoEvolveBtn.textContent = 'Iniciar Auto-Evolución';
+    evolveBtn.disabled = false;
+}
 
 // --- UI Interaction ---
 function updateInfoPanel(genome) {
@@ -247,23 +264,16 @@ evolveBtn.addEventListener('click', () => {
 toggleAutoEvolveBtn.addEventListener('click', () => {
     const currentState = toggleAutoEvolveBtn.dataset.state;
     if (currentState === 'stopped') {
-        // Start auto-evolution
-        autoEvolveInterval = setInterval(runMegaEvolution, 1000);
-        toggleAutoEvolveBtn.dataset.state = 'running';
-        toggleAutoEvolveBtn.textContent = 'Detener Auto-Evolución';
-        evolveBtn.disabled = true; // Disable manual evolution
+        startAutoEvolution();
     } else {
-        // Stop auto-evolution
-        clearInterval(autoEvolveInterval);
-        autoEvolveInterval = null;
-        toggleAutoEvolveBtn.dataset.state = 'stopped';
-        toggleAutoEvolveBtn.textContent = 'Iniciar Auto-Evolución';
-        evolveBtn.disabled = false; // Re-enable manual evolution
+        stopAutoEvolution();
     }
 });
 
-
 animate();
+
+// --- STARTUP LOGIC ---
+startAutoEvolution();
 
 // --- RESIZE HANDLER ---
 function onWindowResize() {
