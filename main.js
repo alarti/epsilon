@@ -126,18 +126,19 @@ terrainWorker.onmessage = (event) => {
   scene.add(terrainMesh);
 
   // Create physics body for the terrain chunk
+  const heightfieldData = transpose(to2DArray(heightmap, CHUNK_SEGMENTS + 1));
   const heightfieldShape = new CANNON.Heightfield(
-    to2DArray(heightmap, CHUNK_SEGMENTS + 1),
+    heightfieldData,
     { elementSize: CHUNK_SIZE / CHUNK_SEGMENTS }
   );
   const terrainBody = new CANNON.Body({ mass: 0, material: groundMaterial });
   terrainBody.addShape(heightfieldShape);
+  // Position the heightfield so its corner aligns with the visual mesh's corner.
+  // With the data transposed, this alignment should now be correct.
   terrainBody.position.set(offsetX - CHUNK_SIZE / 2, 0, offsetZ - CHUNK_SIZE / 2);
 
-  // The Heightfield shape is constructed in the XZ plane, with Y as height.
-  // Our visual mesh is also rotated to be in the XZ plane with Y as height.
-  // So, their orientations match and no extra rotation is needed for the body.
   physicsWorld.addBody(terrainBody);
+  console.log(`Created chunk ${chunkId} at visual:(${offsetX},0,${offsetZ}), physics:(${terrainBody.position.x},0,${terrainBody.position.z})`);
 
   chunks.set(chunkId, { mesh: terrainMesh, body: terrainBody });
 };
@@ -149,6 +150,23 @@ function to2DArray(arr, size) {
     newArr.push(arr.slice(i * size, i * size + size));
   }
   return newArr;
+}
+
+// Helper to transpose a 2D array (swap rows and columns)
+function transpose(matrix) {
+    if (!matrix || matrix.length === 0) {
+        return [];
+    }
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+    const transposed = [];
+    for (let j = 0; j < cols; j++) {
+        transposed[j] = [];
+        for (let i = 0; i < rows; i++) {
+            transposed[j][i] = matrix[i][j];
+        }
+    }
+    return transposed;
 }
 
 // Initial generation
