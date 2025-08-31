@@ -12,17 +12,19 @@
     <div id="ui-overlay">
         <button id="toggle-info-panel" class="panel-toggle-btn">&gt;</button>
         <div id="info-panel" class="panel">
-            <h2>Componentes del Organismo</h2>
+            <h2>Organismo Seleccionado</h2>
             <div id="info-content">
                 <p>Selecciona un organismo para ver sus detalles.</p>
             </div>
-        </div>
 
-        <div id="generation-panel" class="panel">
+            <hr>
+
             <h2>Control de Generaciones</h2>
-            <button id="evolve-btn">Evolucionar (+1)</button>
-            <button id="toggle-auto-evolve" data-state="stopped">Iniciar Auto-Evolución</button>
-            <p>Generación: <span id="generation-count">1</span></p>
+            <div id="generation-controls">
+                <button id="evolve-btn">Evolucionar (+1)</button>
+                <button id="toggle-auto-evolve" data-state="stopped">Iniciar Auto-Evolución</button>
+                <p>Generación: <span id="generation-count">1</span></p>
+            </div>
         </div>
     </div>
 

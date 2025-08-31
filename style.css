@@ -70,10 +70,10 @@ body {
 }
 
 
-#generation-panel {
-  bottom: 20px;
-  right: 20px; /* Changed from left */
-  width: 250px;
+hr {
+  border: none;
+  border-top: 1px solid #444;
+  margin: 20px 0;
 }
 
 h2 {

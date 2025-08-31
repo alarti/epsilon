@@ -13,6 +13,8 @@ const toggleAutoEvolveBtn = document.getElementById('toggle-auto-evolve');
 
 let generation = 1;
 let autoEvolveInterval = null;
+const LIFESPAN = 15; // Organisms live for 15 seconds
+const clock = new THREE.Clock();
 
 // --- SCENE SETUP ---
 const scene = new THREE.Scene();
@@ -81,7 +83,8 @@ function createOrganismFromGenome(genome) {
     scene.add(mesh);
 
     // Store the organism
-    organisms.set(genome.id, { genome, body, mesh });
+    const birthTime = clock.getElapsedTime();
+    organisms.set(genome.id, { genome, body, mesh, birthTime });
 }
 
 function createInitialPopulation() {
@@ -111,7 +114,7 @@ function runMegaEvolution() {
     // Use megaEvolve for a big jump
     const newGenomes = parentGenomes.map(parent => megaEvolve(parent, 1000));
 
-    clearGeneration();
+    // clearGeneration(); // No longer clearing old generations
     newGenomes.forEach(genome => createOrganismFromGenome(genome));
 
     generation += 1000;
@@ -122,10 +125,30 @@ function runMegaEvolution() {
 
 
 // --- ANIMATION LOOP ---
-const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
   const deltaTime = clock.getDelta();
+
+  // --- Cell Death Check ---
+  const now = clock.getElapsedTime();
+  const deadOrganisms = [];
+  for (const [id, organism] of organisms.entries()) {
+      if (now - organism.birthTime > LIFESPAN) {
+          deadOrganisms.push(id);
+      }
+  }
+
+  deadOrganisms.forEach(id => {
+      const organism = organisms.get(id);
+      if (organism) {
+          physicsWorld.removeBody(organism.body);
+          scene.remove(organism.mesh);
+          organism.mesh.geometry.dispose();
+          organism.mesh.material.dispose();
+          organisms.delete(id);
+      }
+  });
+
 
   // Step the physics world
   physicsWorld.step(1 / 60, deltaTime, 3);
@@ -250,7 +273,7 @@ evolveBtn.addEventListener('click', () => {
     const newGenomes = evolve(parentGenomes);
 
     // 3. Clear the old generation
-    clearGeneration();
+    // clearGeneration(); // No longer clearing old generations
 
     // 4. Create the new generation
     newGenomes.forEach(genome => createOrganismFromGenome(genome));
