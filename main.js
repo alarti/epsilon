@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
 import { AIDirector } from './ai-director.js';
 
 // --- DOM & State ---
@@ -11,6 +12,24 @@ const gameState = {
   health: 100,
   keys: 0,
 };
+
+// --- PHYSICS SETUP ---
+const physicsWorld = new CANNON.World({
+  gravity: new CANNON.Vec3(0, -20, 0), // Stronger gravity
+});
+
+const groundMaterial = new CANNON.Material('ground');
+const playerMaterial = new CANNON.Material('player');
+const playerGroundContactMaterial = new CANNON.ContactMaterial(
+  groundMaterial,
+  playerMaterial,
+  {
+    friction: 0.1,
+    restitution: 0.2,
+  }
+);
+physicsWorld.addContactMaterial(playerGroundContactMaterial);
+
 
 // --- SCENE SETUP ---
 const scene = new THREE.Scene();
@@ -36,12 +55,16 @@ const player = {
     new THREE.SphereGeometry(2, 16, 16),
     new THREE.MeshStandardMaterial({ color: 0xff0000 })
   ),
-  velocity: new THREE.Vector3(),
-  direction: new THREE.Vector3(),
+  body: new CANNON.Body({
+    mass: 5,
+    shape: new CANNON.Sphere(2),
+    position: new CANNON.Vec3(0, 10, 0),
+    material: playerMaterial,
+  }),
   speed: 20.0,
   turnSpeed: 2.0,
 };
-player.mesh.position.y = 10; // Start slightly above the ground
+physicsWorld.addBody(player.body);
 scene.add(player.mesh);
 
 const keyboardState = {};
@@ -100,10 +123,33 @@ terrainWorker.onmessage = (event) => {
   const material = new THREE.MeshStandardMaterial({ color: 0x55aa55 });
   const terrainMesh = new THREE.Mesh(geometry, material);
   terrainMesh.position.set(offsetX, 0, offsetZ);
-
   scene.add(terrainMesh);
-  chunks.set(chunkId, terrainMesh);
+
+  // Create physics body for the terrain chunk
+  const heightfieldShape = new CANNON.Heightfield(
+    to2DArray(heightmap, CHUNK_SEGMENTS + 1),
+    { elementSize: CHUNK_SIZE / CHUNK_SEGMENTS }
+  );
+  const terrainBody = new CANNON.Body({ mass: 0, material: groundMaterial });
+  terrainBody.addShape(heightfieldShape);
+  terrainBody.position.set(offsetX - CHUNK_SIZE / 2, 0, offsetZ - CHUNK_SIZE / 2);
+
+  // The Heightfield shape is constructed in the XZ plane, with Y as height.
+  // Our visual mesh is also rotated to be in the XZ plane with Y as height.
+  // So, their orientations match and no extra rotation is needed for the body.
+  physicsWorld.addBody(terrainBody);
+
+  chunks.set(chunkId, { mesh: terrainMesh, body: terrainBody });
 };
+
+// Helper to convert 1D heightmap to 2D array for Cannon.js
+function to2DArray(arr, size) {
+  const newArr = [];
+  for (let i = 0; i < size; i++) {
+    newArr.push(arr.slice(i * size, i * size + size));
+  }
+  return newArr;
+}
 
 // Initial generation
 generateChunks();
@@ -132,8 +178,13 @@ goal.position.set(0, 10, -1 * CHUNK_SIZE);
 scene.add(goal);
 
 function resetLevel() {
-  player.mesh.position.set(0, 10, 0);
-  player.mesh.rotation.set(0, 0, 0);
+  // Reset physics body
+  player.body.position.set(0, 10, 0);
+  player.body.velocity.set(0, 0, 0);
+  player.body.angularVelocity.set(0, 0, 0);
+  player.body.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), 0);
+
+  // Reset game state
   gameState.time = 0;
   doorOverlay.classList.add('hidden');
 }
@@ -185,30 +236,41 @@ function animate() {
   requestAnimationFrame(animate);
   const deltaTime = clock.getDelta();
 
-  // --- Player movement ---
-  const moveDirection = new THREE.Vector3();
+  // --- Step Physics World ---
+  physicsWorld.step(1 / 60, deltaTime, 3);
+
+  // --- Player Controls (now physics-based) ---
+  const moveSpeed = player.speed;
+  const turnSpeed = player.turnSpeed;
+
+  // Forward/backward velocity
   if (keyboardState['KeyW']) {
-    moveDirection.z -= 1;
-  }
-  if (keyboardState['KeyS']) {
-    moveDirection.z += 1;
+    const forward = new CANNON.Vec3();
+    player.body.quaternion.vmult(new CANNON.Vec3(0, 0, -1), forward);
+    player.body.velocity.x = forward.x * moveSpeed;
+    player.body.velocity.z = forward.z * moveSpeed;
+  } else if (keyboardState['KeyS']) {
+    const forward = new CANNON.Vec3();
+    player.body.quaternion.vmult(new CANNON.Vec3(0, 0, 1), forward);
+    player.body.velocity.x = forward.x * moveSpeed;
+    player.body.velocity.z = forward.z * moveSpeed;
+  } else {
+    player.body.velocity.x *= 0.9; // some damping
+    player.body.velocity.z *= 0.9;
   }
 
+  // Turning (angular velocity)
   if (keyboardState['KeyA']) {
-    player.mesh.rotation.y += player.turnSpeed * deltaTime;
-  }
-  if (keyboardState['KeyD']) {
-    player.mesh.rotation.y -= player.turnSpeed * deltaTime;
+    player.body.angularVelocity.y = turnSpeed;
+  } else if (keyboardState['KeyD']) {
+    player.body.angularVelocity.y = -turnSpeed;
+  } else {
+    player.body.angularVelocity.y = 0;
   }
 
-  if (moveDirection.lengthSq() > 0) {
-    // get player's forward direction
-    const forward = new THREE.Vector3();
-    player.mesh.getWorldDirection(forward);
-
-    // move player
-    player.mesh.position.addScaledVector(forward, moveDirection.z * player.speed * deltaTime);
-  }
+  // --- Link Physics to Graphics ---
+  player.mesh.position.copy(player.body.position);
+  player.mesh.quaternion.copy(player.body.quaternion);
 
   // --- Camera follow ---
   const idealOffset = new THREE.Vector3(0, 15, 30); // Behind, up, and away
@@ -217,7 +279,6 @@ function animate() {
   const cameraTargetPosition = player.mesh.position.clone().add(idealOffset);
   camera.position.lerp(cameraTargetPosition, 0.1);
 
-  // Look at a point slightly above the player
   const lookAtTarget = player.mesh.position.clone().add(new THREE.Vector3(0, 2, 0));
   camera.lookAt(lookAtTarget);
 
@@ -229,7 +290,7 @@ function animate() {
   goal.rotation.y += 1 * deltaTime;
   goal.rotation.z += 0.5 * deltaTime;
 
-  if (player.mesh.position.distanceTo(goal.position) < 10) {
+  if (player.body.position.distanceTo(goal.position) < 10) {
     doorOverlay.classList.remove('hidden');
   }
 
