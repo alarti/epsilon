@@ -89,3 +89,26 @@ export function evolve(parentGenomes) {
 
     return newGenomes;
 }
+
+/**
+ * Simulates a massive jump in generations by creating a new random variant.
+ * Over a vast number of generations, the link to the original ancestor's specific
+ * size and color is effectively lost due to continuous random mutations.
+ * @param {object} parentGenome - The starting genome.
+ * @param {number} generations - The number of generations to jump.
+ * @returns {object} A new, drastically evolved genome.
+ */
+export function megaEvolve(parentGenome, generations) {
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+
+    // The new size is completely random, as 100,000 generations of mutation
+    // would likely explore the entire possible range of sizes.
+    const newSize = Math.random() * 0.5 + 0.2; // Radius between 0.2 and 0.7
+
+    return {
+        ...parentGenome, // Inherit stable traits like components
+        id: `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        size: newSize,
+        color: randomColor,
+    };
+}
