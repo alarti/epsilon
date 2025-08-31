@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
-import { generateGenome, evolve, megaEvolve } from './pollination.js';
+import { generateGenome, evolve, megaEvolve, crossover } from './pollination.js';
 
 // --- DOM & State ---
 const organisms = new Map();
@@ -13,8 +13,9 @@ const toggleAutoEvolveBtn = document.getElementById('toggle-auto-evolve');
 
 let generation = 1;
 let autoEvolveInterval = null;
-const LIFESPAN = 15; // Organisms live for 15 seconds
 const clock = new THREE.Clock();
+const REPRODUCTION_COOLDOWN = 4; // seconds
+const SIZE_LIFESPAN_COST_FACTOR = 5; // Larger size reduces lifespan
 
 // --- SCENE SETUP ---
 const scene = new THREE.Scene();
@@ -72,6 +73,8 @@ function createOrganismFromGenome(genome) {
             (Math.random() - 0.5) * 40
         ),
     });
+    body.organismId = genome.id; // Add back-reference
+    body.addEventListener('collide', handleCollision);
     physicsWorld.addBody(body);
 
     // Create visual mesh
@@ -84,7 +87,42 @@ function createOrganismFromGenome(genome) {
 
     // Store the organism
     const birthTime = clock.getElapsedTime();
-    organisms.set(genome.id, { genome, body, mesh, birthTime });
+    organisms.set(genome.id, {
+        genome,
+        body,
+        mesh,
+        birthTime,
+        lastReproductionTime: -REPRODUCTION_COOLDOWN, // Ready to reproduce immediately
+    });
+}
+
+function handleCollision(event) {
+    const bodyA = event.body;
+    const bodyB = event.target;
+
+    const organismA = organisms.get(bodyA.organismId);
+    const organismB = organisms.get(bodyB.organismId);
+
+    // Ensure both organisms exist and we are not at max population
+    if (!organismA || !organismB || organisms.size >= 50) {
+        return;
+    }
+
+    const now = clock.getElapsedTime();
+    // Check if both are ready to reproduce
+    if (now - organismA.lastReproductionTime > REPRODUCTION_COOLDOWN &&
+        now - organismB.lastReproductionTime > REPRODUCTION_COOLDOWN) {
+
+        // They reproduce!
+        const childGenome = crossover(organismA.genome, organismB.genome);
+        createOrganismFromGenome(childGenome);
+
+        // Update their cooldowns
+        organismA.lastReproductionTime = now;
+        organismB.lastReproductionTime = now;
+
+        console.log(`Reproduction between ${organismA.genome.id.slice(-4)} and ${organismB.genome.id.slice(-4)}`);
+    }
 }
 
 function createInitialPopulation() {
@@ -133,7 +171,8 @@ function animate() {
   const now = clock.getElapsedTime();
   const deadOrganisms = [];
   for (const [id, organism] of organisms.entries()) {
-      if (now - organism.birthTime > LIFESPAN) {
+      const effectiveLifespan = organism.genome.lifespan - (organism.genome.size * SIZE_LIFESPAN_COST_FACTOR);
+      if (now - organism.birthTime > effectiveLifespan) {
           deadOrganisms.push(id);
       }
   }

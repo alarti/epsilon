@@ -39,6 +39,7 @@ export function generateGenome() {
         size: Math.random() * 0.5 + 0.2, // Radio entre 0.2 y 0.7
         color: randomColor,
         components: selectedComponents,
+        lifespan: Math.random() * 15 + 10, // Lifespan between 10 and 25 seconds
     };
 }
 
@@ -66,12 +67,66 @@ function mutate(parentGenome) {
         newColor = '#' + newColorVal.toString(16).padStart(6, '0');
     }
 
+    // Mutar lifespan
+    let newLifespan = parentGenome.lifespan;
+    if (Math.random() < mutationRate) {
+        newLifespan += (Math.random() - 0.5) * 2; // Change by up to +/- 1 second
+        newLifespan = Math.max(5, newLifespan); // Minimum lifespan of 5 seconds
+    }
+
     return {
         ...parentGenome, // Hereda componentes y otros rasgos
         id: `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         size: newSize,
         color: newColor,
+        lifespan: newLifespan,
     };
+}
+
+/**
+ * Helper function to mix two hex colors.
+ * @param {string} colorA - e.g., "#RRGGBB"
+ * @param {string} colorB - e.g., "#RRGGBB"
+ * @returns {string} The mixed hex color.
+ */
+function mixColors(colorA, colorB) {
+    const cA = parseInt(colorA.slice(1), 16);
+    const cB = parseInt(colorB.slice(1), 16);
+
+    const rA = (cA >> 16) & 0xff;
+    const gA = (cA >> 8) & 0xff;
+    const bA = cA & 0xff;
+
+    const rB = (cB >> 16) & 0xff;
+    const gB = (cB >> 8) & 0xff;
+    const bB = cB & 0xff;
+
+    const r = Math.floor((rA + rB) / 2);
+    const g = Math.floor((gA + gB) / 2);
+    const b = Math.floor((bA + bB) / 2);
+
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).padStart(6, '0');
+}
+
+
+/**
+ * Combines the genomes of two parents to create a new offspring (sexual reproduction).
+ * @param {object} genomeA - The first parent's genome.
+ * @param {object} genomeB - The second parent's genome.
+ * @returns {object} The new child's genome.
+ */
+export function crossover(genomeA, genomeB) {
+    const childGenome = {
+        id: `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        size: (genomeA.size + genomeB.size) / 2,
+        color: mixColors(genomeA.color, genomeB.color),
+        lifespan: (genomeA.lifespan + genomeB.lifespan) / 2,
+        // Inherit components from one parent at random
+        components: Math.random() < 0.5 ? genomeA.components : genomeB.components,
+    };
+
+    // The child has a chance to mutate
+    return mutate(childGenome);
 }
 
 /**
@@ -104,11 +159,13 @@ export function megaEvolve(parentGenome, generations) {
     // The new size is completely random, as 100,000 generations of mutation
     // would likely explore the entire possible range of sizes.
     const newSize = Math.random() * 0.5 + 0.2; // Radius between 0.2 and 0.7
+    const newLifespan = Math.random() * 15 + 10;
 
     return {
         ...parentGenome, // Inherit stable traits like components
         id: `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         size: newSize,
         color: randomColor,
+        lifespan: newLifespan,
     };
 }
