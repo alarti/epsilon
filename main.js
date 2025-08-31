@@ -172,6 +172,16 @@ function updateInfoPanel(genome) {
         compP.innerHTML = `<strong>${comp.name}:</strong> ${comp.description}`;
         infoContent.appendChild(compP);
     });
+
+    const dnaTitle = document.createElement('h4');
+    dnaTitle.textContent = 'ADN (JSON)';
+    dnaTitle.style.marginTop = '15px';
+    infoContent.appendChild(dnaTitle);
+
+    const pre = document.createElement('pre');
+    pre.className = 'json-display';
+    pre.textContent = JSON.stringify(genome, null, 2);
+    infoContent.appendChild(pre);
 }
 
 const raycaster = new THREE.Raycaster();
@@ -206,11 +216,11 @@ toggleInfoPanelBtn.addEventListener('click', () => {
     infoPanel.classList.toggle('hidden');
     const isHidden = infoPanel.classList.contains('hidden');
     if (isHidden) {
-        toggleInfoPanelBtn.innerHTML = '&gt;';
-        toggleInfoPanelBtn.style.left = '20px';
+        toggleInfoPanelBtn.innerHTML = '&lt;'; // Show "open" symbol
+        toggleInfoPanelBtn.style.right = '20px';
     } else {
-        toggleInfoPanelBtn.innerHTML = '&lt;';
-        toggleInfoPanelBtn.style.left = '280px';
+        toggleInfoPanelBtn.innerHTML = '&gt;'; // Show "close" symbol
+        toggleInfoPanelBtn.style.right = '280px';
     }
 });
 

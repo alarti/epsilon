@@ -27,32 +27,32 @@ body {
 
 #info-panel {
   top: 20px;
-  left: 20px;
+  right: 20px; /* Changed from left */
   width: 250px;
   transition: transform 0.4s ease-in-out;
   z-index: 10;
 }
 
 #info-panel.hidden {
-  transform: translateX(-110%);
+  transform: translateX(110%); /* Changed to slide right */
 }
 
 .panel-toggle-btn {
   position: absolute;
   top: 20px;
-  left: 280px; /* Position it to the right of the panel */
+  right: 280px; /* Changed from left */
   width: 30px;
   height: 30px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 0 5px 5px 0;
+  border-radius: 5px 0 0 5px; /* Flipped border-radius */
   cursor: pointer;
   z-index: 11;
   font-size: 1.2em;
   line-height: 1.5;
   text-align: center;
-  transition: transform 0.4s ease-in-out, left 0.4s ease-in-out;
+  transition: transform 0.4s ease-in-out, right 0.4s ease-in-out; /* Changed from left */
 }
 
 #info-panel.hidden + .panel-toggle-btn {
@@ -124,4 +124,17 @@ h2 {
 
 #generation-count {
   font-weight: bold;
+}
+
+.json-display {
+  background-color: #000;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8em;
+  max-height: 150px;
+  overflow-y: auto;
+  white-space: pre-wrap; /* Wrap long lines */
+  word-break: break-all;
 }
