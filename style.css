@@ -13,9 +13,21 @@ body {
   top: 0;
   left: 0;
   outline: none;
+  z-index: 0;
+}
+
+#ui-overlay {
+  /* This container ensures all UI is in a higher stacking context than the game canvas. */
+  position: relative;
+  z-index: 1;
+  pointer-events: none; /* Allows clicks to go through to the canvas */
 }
 
 /* --- UI Panels --- */
+.panel, .panel-toggle-btn {
+  pointer-events: auto; /* Re-enable pointer events for UI elements */
+}
+
 .panel {
   position: absolute;
   background-color: rgba(0, 0, 0, 0.7);
@@ -30,7 +42,6 @@ body {
   right: 20px; /* Changed from left */
   width: 250px;
   transition: transform 0.4s ease-in-out;
-  z-index: 10;
 }
 
 #info-panel.hidden {
@@ -48,7 +59,6 @@ body {
   border: none;
   border-radius: 5px 0 0 5px; /* Flipped border-radius */
   cursor: pointer;
-  z-index: 11;
   font-size: 1.2em;
   line-height: 1.5;
   text-align: center;
@@ -64,7 +74,6 @@ body {
   bottom: 20px;
   left: 20px;
   width: 250px;
-  z-index: 10;
 }
 
 h2 {
